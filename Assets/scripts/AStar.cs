@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 public class AStar {
-	List<Tile> openList;
-	List<Tile> closedList;
+	List<AStarInterface> openList;
+	List<AStarInterface> closedList;
 
 	public AStar() {
-		this.openList = new List<Tile>();
-		this.closedList = new List<Tile>();
+		this.openList = new List<AStarInterface>();
+		this.closedList = new List<AStarInterface>();
 	}
 
-	public Tile calcAStar(Tile start, Tile end) {
+	public AStarInterface calcAStar(AStarInterface start, AStarInterface end) {
 		openList.Add(start);
 
 		while(openList.Count > 0) {
 			// here we have to sort the list!!!!!
-			Tile currentTile = openList.First(); // get key on position 0
+			AStarInterface currentTile = openList.First(); // get key on position 0
 
 			openList.RemoveAt(0);
 
@@ -31,33 +31,33 @@ public class AStar {
 		return null;
 	}
 
-	public void expandNodes(Tile t, Tile end) {
-		foreach(Tile n in t.getNeighbours()) {
+	public void expandNodes(AStarInterface t, AStarInterface end) {
+		foreach(AStarInterface n in t.getNeighbours()) {
 			if(this.closedList.Contains(n)) 
 				continue;
 
-			float newCosts = n.getCosts() + t.pathcosts;
+			float newCosts = n.getCosts() + t.getPathcosts();
 
 			/*foreach(Tile tmp in openList) {
 				Debug.Log(tmp.getCosts());
 			}*/
 
-			if(this.openList.Contains(n) && newCosts >= n.pathcosts)
+			if(this.openList.Contains(n) && newCosts >= n.getPathcosts())
 				continue;
 
-			n.prev = t;
-			n.pathcosts = newCosts;
+			n.setPrev(t);
+			n.setPathcosts(newCosts);
 
 			float f = newCosts + calcHeuristic(n, end);
 
 			if(openList.Contains(n)) {
-				n.heuristiccost = f;
-				openList.Sort((x,y) => x.heuristiccost.CompareTo(y.heuristiccost));
+				n.setHeuristiccosts(f);
+				openList.Sort((x,y) => x.getHeuristiccosts().CompareTo(y.getHeuristiccosts()));
 			}
 			else {
-				n.heuristiccost = f;
+				n.setHeuristiccosts(f);
 				openList.Add(n);
-				openList.Sort((x,y) => x.heuristiccost.CompareTo(y.heuristiccost));
+				openList.Sort((x,y) => x.getHeuristiccosts().CompareTo(y.getHeuristiccosts()));
 			}
 
 			/*foreach(Tile tmp in openList) {
@@ -66,9 +66,9 @@ public class AStar {
 		}
 	}
 
-	public float calcHeuristic(Tile from, Tile to) {
-		float res = Mathf.Sqrt((to.tileX - from.tileX)*(to.tileX - from.tileX) + 
-		                       (to.tileZ - from.tileZ)*(to.tileZ - from.tileZ));
+	public float calcHeuristic(AStarInterface from, AStarInterface to) {
+		float res = Mathf.Sqrt((to.getPosX() - from.getPosX())*(to.getPosX() - from.getPosX()) + 
+		                       (to.getPosY() - from.getPosY())*(to.getPosY() - from.getPosY()));
 		/*Debug.Log("from[x,y]: " + from.tileX + ", " + from.tileZ 
 		          + " to[x,y]: " + to.tileX + ", " + to.tileZ
 		          + " res: " + res
